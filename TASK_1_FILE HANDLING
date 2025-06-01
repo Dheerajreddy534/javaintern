@@ -1,0 +1,117 @@
+import java.io.*;
+import java.util.*;
+
+public class FileOperations {
+
+    // Global scanner for all input operations
+    private static final Scanner scanner = new Scanner(System.in);
+
+    // Method to read the file
+    public static void readFile(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            System.out.println("\n--- File Content ---");
+            String line;
+            int lineNum = 1;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(lineNum++ + ": " + line);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
+    }
+
+    // Method to write to file
+    public static void writeFile(String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            System.out.print("Enter text to write: ");
+            String content = scanner.nextLine();
+            writer.write(content);
+            writer.newLine();
+            System.out.println("Successfully written to the file.");
+        } catch (IOException e) {
+            System.out.println("Error writing to file: " + e.getMessage());
+        }
+    }
+
+    // Method to modify a specific line
+    public static void modifyLine(String filePath) {
+        try {
+            List<String> lines = new ArrayList<>();
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+            reader.close();
+
+            if (lines.isEmpty()) {
+                System.out.println("File is empty. Nothing to modify.");
+                return;
+            }
+
+            System.out.println("Which line number do you want to modify? (1 to " + lines.size() + "): ");
+            int lineToModify = Integer.parseInt(scanner.nextLine()) - 1;
+
+            if (lineToModify < 0 || lineToModify >= lines.size()) {
+                System.out.println("Invalid line number.");
+                return;
+            }
+
+            System.out.print("Enter new content for line " + (lineToModify + 1) + ": ");
+            String newContent = scanner.nextLine();
+            lines.set(lineToModify, newContent);
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+            for (String l : lines) {
+                writer.write(l);
+                writer.newLine();
+            }
+            writer.close();
+
+            System.out.println("Line modified successfully.");
+        } catch (IOException e) {
+            System.out.println("Error modifying file: " + e.getMessage());
+        }
+    }
+
+    // Main method with menu
+    public static void main(String[] args) {
+        System.out.print("Enter file path (e.g., test.txt): ");
+        String filePath = scanner.nextLine();
+
+        while (true) {
+            System.out.println("\n--- File Operations Menu ---");
+            System.out.println("1. Write to file");
+            System.out.println("2. Read from file");
+            System.out.println("3. Modify a line in file");
+            System.out.println("4. Exit");
+            System.out.print("Choose an option (1-4): ");
+
+            int choice;
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
+
+            switch (choice) {
+                case 1:
+                    writeFile(filePath);
+                    break;
+                case 2:
+                    readFile(filePath);
+                    break;
+                case 3:
+                    modifyLine(filePath);
+                    break;
+                case 4:
+                    System.out.println("Exiting program.");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
+    }
+}
